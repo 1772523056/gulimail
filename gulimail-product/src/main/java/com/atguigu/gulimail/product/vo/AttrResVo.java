@@ -6,4 +6,5 @@ import lombok.Data;
 public class AttrResVo extends AttrVo {
     private String catelogName;
     private String groupName;
+    private String me;
 }
