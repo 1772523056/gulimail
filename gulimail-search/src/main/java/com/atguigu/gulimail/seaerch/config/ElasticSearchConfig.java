@@ -8,7 +8,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ElasticSearchCOnfig {
+public class ElasticSearchConfig {
     public static final RequestOptions COMMON_OPTIONS;
     static {
         RequestOptions.Builder builder = RequestOptions.DEFAULT.toBuilder();

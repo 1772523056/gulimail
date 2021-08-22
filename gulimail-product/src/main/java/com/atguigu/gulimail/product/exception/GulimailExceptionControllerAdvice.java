@@ -35,6 +35,7 @@ public class GulimailExceptionControllerAdvice {
     @ExceptionHandler(value = Exception.class)
     public R handleException(Exception e) {
         log.error("数据校验出现问题{},异常类型{}", e.getMessage(), e.getClass());
+        e.printStackTrace();
         return R.error(BizCodeEnum.UNKNOWN_EXCEPTION.getCode(), BizCodeEnum.UNKNOWN_EXCEPTION.getMesaage());
     }
 }

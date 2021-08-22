@@ -8,4 +8,6 @@ public class AttrResVo extends AttrVo {
     private String groupName;
     private String me;
     private String lk;
+
+    private Long[] catelogPath;
 }

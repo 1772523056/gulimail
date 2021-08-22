@@ -1,5 +1,6 @@
 package com.atguigu.gulimail.product.service;
 
+import com.atguigu.gulimail.product.vo.AttrResVo;
 import com.atguigu.gulimail.product.vo.AttrVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
@@ -16,10 +17,14 @@ import java.util.Map;
  */
 public interface AttrService extends IService<AttrEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    PageUtils queryAttrPage(Map<String, Object> params, Long catelogId, String type);
 
     void saveAttr(AttrVo attr);
 
-    PageUtils queryPage(Map<String, Object> params, Long catelogId);
+//    PageUtils queryPage(Map<String, Object> params, Long catelogId);
+
+    AttrResVo getAttrInfo(Long attrId);
+
+    void updateAttr(AttrResVo attr);
 }
 
