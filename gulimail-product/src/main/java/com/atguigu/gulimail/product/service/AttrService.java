@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimail.product.entity.AttrEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,5 +27,7 @@ public interface AttrService extends IService<AttrEntity> {
     AttrResVo getAttrInfo(Long attrId);
 
     void updateAttr(AttrResVo attr);
+
+    List<AttrEntity> getRelationAttr(Long id);
 }
 
