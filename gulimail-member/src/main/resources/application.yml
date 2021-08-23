@@ -2,7 +2,7 @@ spring:
   datasource:
     username: root
     password: xzb011026
-    url: jdbc:mysql://localhost:3306/gulimall_ums
+    url: jdbc:mysql://localhost:3306/gulimail_ums
     driver-class-name: com.mysql.cj.jdbc.Driver
   cloud:
     nacos:

@@ -3,6 +3,7 @@ package com.atguigu.gulimail.product.controller;
 import java.util.Arrays;
 
 import com.atguigu.gulimail.product.entity.BrandEntity;
+import com.atguigu.gulimail.product.vo.BrandVo;
 import com.atguigu.gulimail.product.vo.CateVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,8 +46,14 @@ public class CategoryBrandRelationController {
     @RequestMapping("/brands/list")
     public R brandlist(@RequestParam Long catId){
         BrandEntity[] page = categoryBrandRelationService.queryBrandList(catId);
-
-        return R.ok().put("data", page);
+        BrandVo[] brandVo = new BrandVo[page.length];
+        for (int i = 0; i < page.length; i++) {
+            BrandVo brandVo1 = new BrandVo();
+            brandVo1.setBrandId(page[i].getBrandId());
+            brandVo1.setBrandName(page[i].getName());
+            brandVo[i]=brandVo1;
+        }
+        return R.ok().put("data", brandVo);
     }
 
 

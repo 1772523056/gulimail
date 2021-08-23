@@ -9,6 +9,7 @@ import com.atguigu.gulimail.product.entity.AttrEntity;
 import com.atguigu.gulimail.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimail.product.service.AttrService;
 import com.atguigu.gulimail.product.service.CategoryService;
+import com.atguigu.gulimail.product.vo.AttrGroupWithAttrVo;
 import com.atguigu.gulimail.product.vo.AttrRelationVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,12 @@ public class AttrGroupController {
     private AttrService attrService;
     @Autowired
     private AttrAttrgroupRelationService attrAttrgroupRelationService;
+
+    @RequestMapping("{catelogId}/withattr")
+    public R getAttrGroupWithAttr(@PathVariable long catelogId){
+        AttrGroupWithAttrVo[] list=attrGroupService.getAttrGroupWithAttr(catelogId);
+        return R.ok().put("data",list);
+    }
 
     @RequestMapping("/attr/relation")
     public R upadteRelation(@RequestBody List<AttrAttrgroupRelationEntity> attrRelationVo){
