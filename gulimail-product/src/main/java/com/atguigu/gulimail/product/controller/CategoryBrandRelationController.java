@@ -1,9 +1,9 @@
 package com.atguigu.gulimail.product.controller;
 
 import java.util.Arrays;
-import java.util.Map;
 
-import com.atguigu.gulimail.product.vo.BrandVo;
+import com.atguigu.gulimail.product.entity.BrandEntity;
+import com.atguigu.gulimail.product.vo.CateVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.atguigu.gulimail.product.entity.CategoryBrandRelationEntity;
 import com.atguigu.gulimail.product.service.CategoryBrandRelationService;
-import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.R;
 
 
@@ -38,7 +37,14 @@ public class CategoryBrandRelationController {
 //     */
     @RequestMapping("/catelog/list")
     public R list(@RequestParam Long brandId){
-        BrandVo[] page = categoryBrandRelationService.queryPage(brandId);
+        CateVo[] page = categoryBrandRelationService.queryCateList(brandId);
+
+        return R.ok().put("data", page);
+    }
+
+    @RequestMapping("/brands/list")
+    public R brandlist(@RequestParam Long catId){
+        BrandEntity[] page = categoryBrandRelationService.queryBrandList(catId);
 
         return R.ok().put("data", page);
     }

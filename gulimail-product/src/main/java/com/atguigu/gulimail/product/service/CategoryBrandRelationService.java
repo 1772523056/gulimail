@@ -1,6 +1,7 @@
 package com.atguigu.gulimail.product.service;
 
-import com.atguigu.gulimail.product.vo.BrandVo;
+import com.atguigu.gulimail.product.entity.BrandEntity;
+import com.atguigu.gulimail.product.vo.CateVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.gulimail.product.entity.CategoryBrandRelationEntity;
 
@@ -13,7 +14,9 @@ import com.atguigu.gulimail.product.entity.CategoryBrandRelationEntity;
  */
 public interface CategoryBrandRelationService extends IService<CategoryBrandRelationEntity> {
 
-    BrandVo[] queryPage(Long brandId);
+    CateVo[] queryCateList(Long brandId);
+
+    BrandEntity[] queryBrandList(Long cateId);
 
     void saveBrandRelation(CategoryBrandRelationEntity categoryBrandRelation);
 }

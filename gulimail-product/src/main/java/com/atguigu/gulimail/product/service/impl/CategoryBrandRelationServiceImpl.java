@@ -3,12 +3,13 @@ package com.atguigu.gulimail.product.service.impl;
 import com.atguigu.gulimail.product.dao.BrandDao;
 import com.atguigu.gulimail.product.dao.CategoryDao;
 import com.atguigu.gulimail.product.entity.BrandEntity;
-import com.atguigu.gulimail.product.vo.BrandVo;
+import com.atguigu.gulimail.product.vo.CateVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -27,28 +28,38 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
     CategoryDao categoryDao;
 
     @Override
-    public BrandVo[] queryPage(Long brandId) {
+    public CateVo[] queryCateList(Long brandId) {
 //        IPage<CategoryBrandRelationEntity> page = this.page(
 //                new Query<CategoryBrandRelationEntity>().getPage(params),
 //                new QueryWrapper<CategoryBrandRelationEntity>()
 //        );
         List<CategoryBrandRelationEntity> categoryBrandRelationEntity = this.baseMapper.selectList(
                 new QueryWrapper<CategoryBrandRelationEntity>().eq("brand_id", brandId));
-        List<BrandVo> blist=new ArrayList<>();
+        List<CateVo> blist=new ArrayList<>();
         for (CategoryBrandRelationEntity brandRelationEntity : categoryBrandRelationEntity) {
-            BrandVo brandVo = new BrandVo();
+            CateVo cateVo = new CateVo();
+
             Long catelogId = brandRelationEntity.getCatelogId();
             String name = null;
             if (catelogId != null) {
                 name = categoryDao.selectById(catelogId).getName();
             }
-            brandVo.setCatelogId(catelogId);
-            brandVo.setCatelogName(name);
-            blist.add(brandVo);
+            cateVo.setCatelogId(catelogId);
+            cateVo.setCatelogName(name);
+            blist.add(cateVo);
         }
 
 
-        return blist.toArray(new BrandVo[0]);
+        return blist.toArray(new CateVo[0]);
+    }
+
+    @Override
+    public BrandEntity[] queryBrandList(Long cateId) {
+        List<CategoryBrandRelationEntity> catelog_id = this.baseMapper.selectList(
+                new QueryWrapper<CategoryBrandRelationEntity>().eq("catelog_id", cateId));
+        List<Long> collect = catelog_id.stream().map(ele -> ele.getBrandId()).collect(Collectors.toList());
+        List<BrandEntity> brandEntities = brandDao.selectBatchIds(collect);
+        return brandEntities.toArray(new BrandEntity[brandEntities.size()]);
     }
 
     @Override
