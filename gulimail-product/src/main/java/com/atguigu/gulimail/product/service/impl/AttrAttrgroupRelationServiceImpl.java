@@ -1,7 +1,6 @@
 package com.atguigu.gulimail.product.service.impl;
 
-import com.atguigu.gulimail.product.vo.Attrattrgroupralationvo;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.atguigu.gulimail.product.vo.AttrRelationVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -35,13 +34,18 @@ public class AttrAttrgroupRelationServiceImpl extends ServiceImpl<AttrAttrgroupR
     }
 
     @Override
-    public void deleteRelation(Attrattrgroupralationvo[] relations) {
+    public void deleteRelation(AttrRelationVo[] relations) {
         List<AttrAttrgroupRelationEntity> realtionList = Arrays.asList(relations).stream().map((ele) -> {
             AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
             BeanUtils.copyProperties(ele, attrAttrgroupRelationEntity);
             return attrAttrgroupRelationEntity;
         }).collect(Collectors.toList());
         this.baseMapper.deleteBatchRelations(realtionList);
+    }
+
+    @Override
+    public void saveBatch(List<AttrRelationVo> attrRelationVo) {
+
     }
 
 }

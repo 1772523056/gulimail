@@ -1,10 +1,11 @@
 package com.atguigu.gulimail.product.service;
 
-import com.atguigu.gulimail.product.vo.Attrattrgroupralationvo;
+import com.atguigu.gulimail.product.vo.AttrRelationVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimail.product.entity.AttrAttrgroupRelationEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,6 +19,8 @@ public interface AttrAttrgroupRelationService extends IService<AttrAttrgroupRela
 
     PageUtils queryPage(Map<String, Object> params);
 
-    void deleteRelation(Attrattrgroupralationvo[] relation);
+    void deleteRelation(AttrRelationVo[] relation);
+
+    void saveBatch(List<AttrRelationVo> attrRelationVo);
 }
 

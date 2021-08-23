@@ -17,6 +17,7 @@ import com.atguigu.gulimail.product.vo.AttrVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
     public PageUtils queryAttrPage(Map<String, Object> params, Long catelogId, String type) {
         String key = (String) params.get("key");
         QueryWrapper<AttrEntity> wrapper = new QueryWrapper<AttrEntity>().
-                eq("attr_type", "base".equalsIgnoreCase(type) ? ProductConstant.AttrEnum.SALE.getCode() : ProductConstant.AttrEnum.BASE.getCode());
+                eq("attr_type", "base".equalsIgnoreCase(type) ? ProductConstant.AttrEnum.BASE.getCode() : ProductConstant.AttrEnum.SALE.getCode());
 
         if (!StringUtils.isEmpty(key)) {
             wrapper.and((obj) -> {
@@ -90,7 +91,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
             if ("base".equalsIgnoreCase(type)) {
                 if (attr_id != null) {
                     AttrGroupEntity attr_group_id = attrGroupDao.selectById(attr_id.getAttrGroupId());
-                    attrResVo.setGroupName(attr_group_id.getAttrGroupName());
+                    if (attr_group_id != null)
+                        attrResVo.setGroupName(attr_group_id.getAttrGroupName());
                 }
             }
             CategoryEntity cat_id = categoryDao.selectById(ele.getCatelogId());
@@ -108,11 +110,17 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrResVo attrResVo = new AttrResVo();
         AttrEntity attrEntity = this.getById(attrId);
         BeanUtils.copyProperties(attrEntity, attrResVo);
-        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.SALE.getCode()) {
+        if (attrEntity.getAttrType() == ProductConstant.AttrEnum.BASE.getCode()) {
             AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = attrAttrgroupRelationDao.selectOne(
                     new QueryWrapper<AttrAttrgroupRelationEntity>().eq("attr_id", attrEntity.getAttrId()));
-            AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
-            attrResVo.setGroupName(attrGroupEntity.getAttrGroupName());
+            if (attrAttrgroupRelationEntity != null) {
+                Long attrGroupId = attrAttrgroupRelationEntity.getAttrGroupId();
+                if (attrGroupId != null) {
+                    AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrGroupId);
+
+                    attrResVo.setGroupName(attrGroupEntity.getAttrGroupName());
+                }
+            }
         }
         Long catelogId = attrEntity.getCatelogId();
         Long[] categoryPath = categoryService.getCategoryPath(catelogId);
@@ -143,6 +151,39 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         if (collect == null || collect.size() == 0)
             return null;
         return (List<AttrEntity>) this.listByIds(collect);
+    }
+
+    @Override
+    public PageUtils getNoRelation(Long groupId, Map<String, Object> params) {
+        //1.查出当前分组关联的分类里的其他分组关联的所有属性
+        AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(groupId);
+        Long catelogId = attrGroupEntity.getCatelogId();
+        List<AttrGroupEntity> attrGroupEntityList = attrGroupDao.selectList(new QueryWrapper<AttrGroupEntity>()
+                .eq("catelog_id", catelogId));
+        List<Long> groupIdList = attrGroupEntityList.stream().map(ele -> ele.getAttrGroupId()).collect(Collectors.toList());
+
+
+        List<AttrAttrgroupRelationEntity> attrList = attrAttrgroupRelationDao.selectList(
+                new QueryWrapper<AttrAttrgroupRelationEntity>().in("attr_group_id", groupIdList));
+
+        List<Long> collect = attrList.stream().map(ele -> ele.getAttrId()).collect(Collectors.toList());
+
+        //查出当前分组关联的所有属性并剔除上面查出的collect
+        QueryWrapper<AttrEntity> attrEntityQueryWrapper = new QueryWrapper<AttrEntity>().
+                eq("catelog_id", catelogId).eq("attr_type", ProductConstant.AttrEnum.BASE.getCode());
+        if (collect != null && collect.size() > 0) {
+            attrEntityQueryWrapper.notIn("attr_id", collect);
+        }
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
+            attrEntityQueryWrapper.and((ele) -> {
+                ele.eq("attr_id", key).or().like("attr_name", key);
+            });
+        }
+        IPage<AttrEntity> page = this.page(new Page<AttrEntity>(), attrEntityQueryWrapper);
+
+
+        return new PageUtils(page);
     }
 
 }

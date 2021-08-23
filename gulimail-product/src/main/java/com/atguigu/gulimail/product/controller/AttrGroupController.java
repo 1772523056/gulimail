@@ -4,13 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.atguigu.gulimail.product.dao.AttrAttrgroupRelationDao;
 import com.atguigu.gulimail.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimail.product.entity.AttrEntity;
 import com.atguigu.gulimail.product.service.AttrAttrgroupRelationService;
 import com.atguigu.gulimail.product.service.AttrService;
 import com.atguigu.gulimail.product.service.CategoryService;
-import com.atguigu.gulimail.product.vo.Attrattrgroupralationvo;
+import com.atguigu.gulimail.product.vo.AttrRelationVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -41,10 +40,25 @@ public class AttrGroupController {
     @Autowired
     private AttrAttrgroupRelationService attrAttrgroupRelationService;
 
+    @RequestMapping("/attr/relation")
+    public R upadteRelation(@RequestBody List<AttrAttrgroupRelationEntity> attrRelationVo){
+        attrAttrgroupRelationService.saveBatch(attrRelationVo);
+        return R.ok();
+
+    }
+
     @RequestMapping("/attr/relation/delete")
-    public R deleteRelation(@RequestBody Attrattrgroupralationvo[] relation) {
+    public R deleteRelation(@RequestBody AttrRelationVo[] relation) {
         attrAttrgroupRelationService.deleteRelation(relation);
         return R.ok();
+    }
+
+    ///product/attrgroup/{attrgroupId}/noattr/relation
+    @RequestMapping("/{attrgroupId}/noattr/relation")
+    public R getNoRelation(@RequestParam Map<String, Object> params,
+                           @PathVariable("attrgroupId") Long id) {
+        PageUtils page = attrService.getNoRelation(id,params);
+        return R.ok().put("page", page);
     }
 
     /**

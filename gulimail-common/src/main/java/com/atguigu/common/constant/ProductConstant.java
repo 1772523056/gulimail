@@ -5,7 +5,7 @@ import lombok.Data;
 public class ProductConstant {
 
     public enum AttrEnum{
-        BASE(0,"基本属性"),SALE(1,"销售属性");
+        BASE(1,"基本属性"),SALE(0,"销售属性");
         private int code;
         private String msg;
 
