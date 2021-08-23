@@ -3,6 +3,7 @@ package com.atguigu.gulimail.product.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimail.product.vo.BrandVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,14 +31,16 @@ public class CategoryBrandRelationController {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
 
-    /**
-     * 列表
-     */
-    @RequestMapping("/list")
-    public R list(@RequestParam Map<String, Object> params){
-        PageUtils page = categoryBrandRelationService.queryPage(params);
+////    @RequestMapping("/brands/list")
+////    public R
+////    /**
+//     * 列表
+//     */
+    @RequestMapping("/catelog/list")
+    public R list(@RequestParam Long brandId){
+        BrandVo[] page = categoryBrandRelationService.queryPage(brandId);
 
-        return R.ok().put("page", page);
+        return R.ok().put("data", page);
     }
 
 
@@ -56,7 +59,7 @@ public class CategoryBrandRelationController {
      */
     @RequestMapping("/save")
     public R save(@RequestBody CategoryBrandRelationEntity categoryBrandRelation){
-		categoryBrandRelationService.save(categoryBrandRelation);
+		categoryBrandRelationService.saveBrandRelation(categoryBrandRelation);
 
         return R.ok();
     }

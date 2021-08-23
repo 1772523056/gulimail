@@ -1,10 +1,8 @@
 package com.atguigu.gulimail.product.service;
 
+import com.atguigu.gulimail.product.vo.BrandVo;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimail.product.entity.CategoryBrandRelationEntity;
-
-import java.util.Map;
 
 /**
  * Ʒ�Ʒ������
@@ -15,6 +13,8 @@ import java.util.Map;
  */
 public interface CategoryBrandRelationService extends IService<CategoryBrandRelationEntity> {
 
-    PageUtils queryPage(Map<String, Object> params);
+    BrandVo[] queryPage(Long brandId);
+
+    void saveBrandRelation(CategoryBrandRelationEntity categoryBrandRelation);
 }
 
