@@ -3,6 +3,7 @@ package com.atguigu.gulimail.coupon.controller;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.common.to.SkuReductionTo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,6 +30,13 @@ import com.atguigu.common.utils.R;
 public class SkuFullReductionController {
     @Autowired
     private SkuFullReductionService skuFullReductionService;
+
+    @RequestMapping("/saveinfo")
+    public R saveinfo(@RequestParam SkuReductionTo skuReductionTo){
+        skuFullReductionService.saveSkuReduction(skuReductionTo );
+
+        return R.ok();
+    }
 
     /**
      * 列表
