@@ -4,8 +4,14 @@ spring:
   datasource:
     username: root
     password: xzb011026
-    url: jdbc:mysql://localhost:3306/gulimail_wms
+    url: jdbc:mysql://localhost:3306/gulimall_wms
     driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 127.0.0.1:8848
+  application:
+    name: gulimail-ware
 mybatis-plus:
   global-config:
     db-config:

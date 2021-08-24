@@ -21,7 +21,7 @@ public class SpuSaveVo {
     private Long catalogId;
     private Long brandId;
     private BigDecimal weight;
-    private Long publishStatus;
+    private Integer publishStatus;
     private List<String> decript;
     private List<String> images;
     private Bounds bounds;
