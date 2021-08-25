@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/gulimail.iml" filepath="$PROJECT_DIR$/gulimail.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-common/gulimail-common.iml" filepath="$PROJECT_DIR$/gulimail-common/gulimail-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-coupon/gulimail-coupon.iml" filepath="$PROJECT_DIR$/gulimail-coupon/gulimail-coupon.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-member/gulimail-member.iml" filepath="$PROJECT_DIR$/gulimail-member/gulimail-member.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-order/gulimail-order.iml" filepath="$PROJECT_DIR$/gulimail-order/gulimail-order.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-product/gulimail-product.iml" filepath="$PROJECT_DIR$/gulimail-product/gulimail-product.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-third-party/gulimail-third-party.iml" filepath="$PROJECT_DIR$/gulimail-third-party/gulimail-third-party.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-ware/gulimail-ware.iml" filepath="$PROJECT_DIR$/gulimail-ware/gulimail-ware.iml" />
+      <module fileurl="file://$PROJECT_DIR$/renren-fast/renren-fast.iml" filepath="$PROJECT_DIR$/renren-fast/renren-fast.iml" />
+      <module fileurl="file://$PROJECT_DIR$/renren-generator/renren-generator.iml" filepath="$PROJECT_DIR$/renren-generator/renren-generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/gulimail-search/seaerch.iml" filepath="$PROJECT_DIR$/gulimail-search/seaerch.iml" />
+    </modules>
+  </component>
+</project>

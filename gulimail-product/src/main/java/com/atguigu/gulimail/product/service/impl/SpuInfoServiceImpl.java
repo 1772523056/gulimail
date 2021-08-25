@@ -64,99 +64,6 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
-    //    @Transactional
-//    @Override
-//    public void saveSpuInfo(SpuSaveVo spuInfo) {
-//        //1.保存spu的基本信息
-//        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
-//        BeanUtils.copyProperties(spuInfo, spuInfoEntity);
-//        spuInfoEntity.setCreateTime(new Date());
-//        spuInfoEntity.setUpdateTime(new Date());
-//        this.save(spuInfoEntity);
-//
-//        //2.保存spu的描述图片
-//        List<String> decript = spuInfo.getDecript();
-//        SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
-//        spuInfoDescEntity.setSpuId(spuInfoEntity.getId());
-//        spuInfoDescEntity.setDecript(String.join(",", decript));
-//        spuInfoDescService.saveSpuInfoDesc(spuInfoDescEntity);
-//
-//        //3.保存spu的图片集
-//        List<String> images1 = spuInfo.getImages();
-//        spuImagesService.saveImages(spuInfoEntity.getId(), images1);
-//
-//        //4.保存spu的规格参数
-//        List<BaseAttrs> baseAttrs = spuInfo.getBaseAttrs();
-//        List<ProductAttrValueEntity> collect = baseAttrs.stream().map(ele -> {
-//            ProductAttrValueEntity v = new ProductAttrValueEntity();
-//            v.setSpuId(spuInfoEntity.getId());
-//            v.setAttrName(attrService.getById(ele.getAttrId()).getAttrName());
-//            v.setAttrValue(ele.getAttrValues());
-//            v.setQuickShow(ele.getShowDesc());
-//            v.setAttrId(ele.getAttrId());
-//            return v;
-//        }).collect(Collectors.toList());
-//        productAttrValueService.saveBatch(collect);
-//        //5.保存spu对应的sku信息
-//
-//        List<Skus> skus = spuInfo.getSkus();
-//        if (skus != null && skus.size() > 0) {
-//            skus.forEach(ele -> {
-//                String defaultImage = "";
-//                for (Images image : ele.getImages()) {
-//                    if (image.getDefaultImg() == 1)
-//                        defaultImage = image.getImgUrl();
-//                }
-//                //5.1 SKU的基本信息；pms_sku_info
-//                SkuInfoEntity skuInfoEntity = new SkuInfoEntity();
-//                BeanUtils.copyProperties(ele, skuInfoEntity);
-//                skuInfoEntity.setSpuId(spuInfoEntity.getId());
-//                //skuInfoEntity.setSkuDesc();
-//                skuInfoEntity.setCatalogId(spuInfoEntity.getCatalogId());
-//                skuInfoEntity.setBrandId(spuInfoEntity.getBrandId());
-//                skuInfoEntity.setSkuDefaultImg(defaultImage);
-//                skuInfoEntity.setSaleCount(0L);
-//
-//                skuInfoService.saveSkuInfo(skuInfoEntity);
-//
-//                List<Images> images = ele.getImages();
-//                List<SkuImagesEntity> skuImagesEntities = images.stream().map(img -> {
-//                    SkuImagesEntity skuImagesEntity = new SkuImagesEntity();
-//                    BeanUtils.copyProperties(img, skuImagesEntity);
-//                    skuImagesEntity.setSkuId(skuInfoEntity.getSkuId());
-//
-//                    return skuImagesEntity;
-//                }).filter(entity -> {
-//                    return StringUtils.isNotEmpty(entity.getImgUrl());
-//                }).collect(Collectors.toList());
-//
-//                //5.3 SKU的销售属性信息：pms_sku_sale_attr_value
-//                List<Attr> attrs = ele.getAttr();
-//                List<SkuSaleAttrValueEntity> skuSaleAttrValueEntities = attrs.stream().map(attr -> {
-//                    SkuSaleAttrValueEntity skuSaleAttrValueEntity = new SkuSaleAttrValueEntity();
-//                    BeanUtils.copyProperties(attr, skuSaleAttrValueEntity);
-//                    skuSaleAttrValueEntity.setSkuId(skuInfoEntity.getSkuId());
-//                    return skuSaleAttrValueEntity;
-//                }).collect(Collectors.toList());
-//
-//                skuSaleAttrValueService.saveBatch(skuSaleAttrValueEntities);
-//
-//                //5.4 SKU的优惠，满减等信息；sms_sku_ladder；sms_sku_full_reduction；sms_member_price
-//                SkuReductionTo skuReductionTo = new SkuReductionTo();
-//                BeanUtils.copyProperties(item, skuReductionTo);
-//                skuReductionTo.setSkuId(skuInfoEntity.getSkuId());
-//
-//                if (skuReductionTo.getFullCount() <= 0 || skuReductionTo.getFullPrice().compareTo(new BigDecimal("0")) == 1) {
-//                    R r1 = couponFenService.saveSkuReduction(skuReductionTo);
-//                    if (r1.getCode() != 0) {
-//                        log.error("保存远程SKU优惠信息失败");
-//                    }
-//                }
-//
-//
-//            });
-//        }
-//    }
     @Override
     @Transactional
     public void saveSpuInfo(SpuSaveVo spuSaveVo) {
@@ -333,15 +240,17 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         List<Long> skuIds = skuInfoList.stream().map(ele -> ele.getSkuId()).collect(Collectors.toList());
         //远程调用若有异常则继续
+        Map<Long, Boolean> collect = null;
         try {
             R<List<SkuHasStockVo>> skuHasStockVos = wareFeignService.hasStock(skuIds);
-            Map<Long, Boolean> collect = skuHasStockVos.getData().stream()
+            collect = skuHasStockVos.getData().stream()
                     .collect(Collectors.toMap(e -> e.getSkuId(), ele -> ele.isHasStock()));
         } catch (Exception e) {
             System.out.println(e);
         }
 
 
+        Map<Long, Boolean> finalCollect = collect;
         List<SkuEsModel> skuEsModelList = skuInfoList.stream().map(ele -> {
             //组装需要的数据
             SkuEsModel esModel = new SkuEsModel();
@@ -351,7 +260,11 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             esModel.setSkuPrice(ele.getPrice());
             //hasStock,hotScore
             //TODO 远程调用查询库存系统是否有库存
-            esModel.setHasStock(collect.get(esModel.getSkuId()));
+            if (finalCollect == null) {
+                esModel.setHasStock(true);
+            } else {
+                esModel.setHasStock(finalCollect.get(esModel.getSkuId()));
+            }
             //TODO 热度评分 默认0
 
 
