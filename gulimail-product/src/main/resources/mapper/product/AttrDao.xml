@@ -3,7 +3,7 @@
 
 <mapper namespace="com.atguigu.gulimail.product.dao.AttrDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.atguigu.gulimail.product.entity.AttrEntity" id="attrMap">
         <result property="attrId" column="attr_id"/>
         <result property="attrName" column="attr_name"/>
@@ -15,6 +15,13 @@
         <result property="catelogId" column="catelog_id"/>
         <result property="showDesc" column="show_desc"/>
     </resultMap>
+    <select id="selectSearchAttrs" resultType="java.lang.Long">
+        select attr_id from gulimall_pms.pms_attr where attr_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        and search_type=1
+    </select>
 
 
 </mapper>

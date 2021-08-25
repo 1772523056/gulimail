@@ -183,7 +183,14 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         IPage<AttrEntity> page = this.page(new Page<AttrEntity>(), attrEntityQueryWrapper);
 
 
+
+
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<Long> selectSearchAttrs(List<Long> id) {
+        return baseMapper.selectSearchAttrs(id);
     }
 
 }

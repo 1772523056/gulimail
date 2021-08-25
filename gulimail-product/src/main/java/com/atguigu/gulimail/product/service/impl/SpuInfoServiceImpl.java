@@ -2,12 +2,14 @@ package com.atguigu.gulimail.product.service.impl;
 
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundTo;
+import com.atguigu.common.to.es.SkuEsModel;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.common.utils.Query;
 import com.atguigu.common.utils.R;
 import com.atguigu.gulimail.product.dao.SpuInfoDao;
 import com.atguigu.gulimail.product.entity.*;
 import com.atguigu.gulimail.product.feign.CouponFeignService;
+import com.atguigu.gulimail.product.feign.WareFeignService;
 import com.atguigu.gulimail.product.service.*;
 import com.atguigu.gulimail.product.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -20,10 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.time.Year;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service("spuInfoService")
@@ -45,6 +47,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     SkuSaleAttrValueService skuSaleAttrValueService;
     @Autowired
     CouponFeignService couponFeignService;
+    @Autowired
+    BrandService brandService;
+    @Autowired
+    CategoryService categoryService;
+    @Autowired
+    WareFeignService wareFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -266,30 +274,31 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             });
         }
     }
+
     @Override
     public PageUtils queryPageByCondition(Map<String, Object> params) {
         QueryWrapper<SpuInfoEntity> queryWrapper = new QueryWrapper<>();
 
-        String key=(String)params.get("key");
-        if(!StringUtils.isEmpty(key)){
+        String key = (String) params.get("key");
+        if (!StringUtils.isEmpty(key)) {
             queryWrapper.and(item -> {
-                item.eq("id",key).or().like("spu_name",key);
+                item.eq("id", key).or().like("spu_name", key);
             });
         }
 
-        String status=(String)params.get("status");
-        if(!StringUtils.isEmpty(status)){
-            queryWrapper.eq("publish_status",status);
+        String status = (String) params.get("status");
+        if (!StringUtils.isEmpty(status)) {
+            queryWrapper.eq("publish_status", status);
         }
 
-        String brandId=(String)params.get("brandId");
-        if(!StringUtils.isEmpty(brandId) && (!"0".equalsIgnoreCase(brandId))){
-            queryWrapper.eq("brand_id",brandId);
+        String brandId = (String) params.get("brandId");
+        if (!StringUtils.isEmpty(brandId) && (!"0".equalsIgnoreCase(brandId))) {
+            queryWrapper.eq("brand_id", brandId);
         }
 
-        String catelogId=(String) params.get("catelogId");
-        if(!StringUtils.isEmpty(catelogId) && (!"0".equalsIgnoreCase(catelogId))){
-            queryWrapper.eq("catalog_id",catelogId);
+        String catelogId = (String) params.get("catelogId");
+        if (!StringUtils.isEmpty(catelogId) && (!"0".equalsIgnoreCase(catelogId))) {
+            queryWrapper.eq("catalog_id", catelogId);
         }
 
         IPage<SpuInfoEntity> page = this.page(
@@ -298,6 +307,63 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         );
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void up(Long spuId) {
+        List<SkuInfoEntity> skuInfoList = skuInfoService.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
+
+        //TODO 查询当前spu的所有可以被用来检索规格属性
+        List<ProductAttrValueEntity> productAttrValueEntities = productAttrValueService.list(
+                new QueryWrapper<ProductAttrValueEntity>().eq("spu_id", spuId));
+        List<Long> attrIdList = productAttrValueEntities.stream()
+                .map(e -> e.getAttrId()).collect(Collectors.toList());
+
+        List<Long> list = attrService.selectSearchAttrs(attrIdList);
+        Set<Long> idSet = new HashSet<>(list);
+
+        List<SkuEsModel.Attrs> attrsList = productAttrValueEntities.stream()
+                .filter(ele -> idSet.contains(ele.getAttrId()))
+                .map(e -> {
+                    SkuEsModel.Attrs attrs = new SkuEsModel.Attrs();
+                    BeanUtils.copyProperties(e, attrs);
+                    return attrs;
+                })
+                .collect(Collectors.toList());
+
+        List<Long> skuIds = skuInfoList.stream().map(ele -> ele.getSkuId()).collect(Collectors.toList());
+        //远程调用若有异常则继续
+        try {
+            R<List<SkuHasStockVo>> skuHasStockVos = wareFeignService.hasStock(skuIds);
+            Map<Long, Boolean> collect = skuHasStockVos.getData().stream()
+                    .collect(Collectors.toMap(e -> e.getSkuId(), ele -> ele.isHasStock()));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+
+
+        List<SkuEsModel> skuEsModelList = skuInfoList.stream().map(ele -> {
+            //组装需要的数据
+            SkuEsModel esModel = new SkuEsModel();
+            BeanUtils.copyProperties(ele, esModel);
+            //skuImg,skuPrice
+            esModel.setSkuImag(ele.getSkuDefaultImg());
+            esModel.setSkuPrice(ele.getPrice());
+            //hasStock,hotScore
+            //TODO 远程调用查询库存系统是否有库存
+            esModel.setHasStock(collect.get(esModel.getSkuId()));
+            //TODO 热度评分 默认0
+
+
+            //TODO 查询品牌和分类的名字信息
+            BrandEntity brandEntity = brandService.getBaseMapper().selectById(ele.getBrandId());
+            esModel.setBrandName(brandEntity.getName());
+            esModel.setBrandImg(brandEntity.getLogo());
+            esModel.setCatalogName(categoryService.getBaseMapper().selectById(ele.getCatalogId()).getName());
+            esModel.setAttrs(attrsList);
+
+            return esModel;
+        }).collect(Collectors.toList());
     }
 
 

@@ -8,6 +8,7 @@ import com.atguigu.gulimail.product.entity.AttrEntity;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * ��Ʒ����
@@ -31,5 +32,7 @@ public interface AttrService extends IService<AttrEntity> {
     List<AttrEntity> getRelationAttr(Long id);
 
     PageUtils getNoRelation(Long id, Map<String, Object> params);
+
+    List<Long> selectSearchAttrs(List<Long> id);
 }
 
