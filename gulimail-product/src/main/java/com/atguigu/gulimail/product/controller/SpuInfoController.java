@@ -28,8 +28,8 @@ public class SpuInfoController {
     private SpuInfoService spuInfoService;
 
     @PostMapping("/{spuId}/up")
-    public R productUp(@PathVariable Long id){
-        spuInfoService.up(id);
+    public R productUp(@PathVariable Long spuId){
+        spuInfoService.up(spuId);
         return R.ok();
     }
 

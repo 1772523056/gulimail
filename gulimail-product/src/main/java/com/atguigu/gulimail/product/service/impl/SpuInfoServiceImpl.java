@@ -1,5 +1,6 @@
 package com.atguigu.gulimail.product.service.impl;
 
+import com.atguigu.common.constant.ProductConstant;
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundTo;
 import com.atguigu.common.to.es.SkuEsModel;
@@ -9,12 +10,14 @@ import com.atguigu.common.utils.R;
 import com.atguigu.gulimail.product.dao.SpuInfoDao;
 import com.atguigu.gulimail.product.entity.*;
 import com.atguigu.gulimail.product.feign.CouponFeignService;
+import com.atguigu.gulimail.product.feign.SearchFeignService;
 import com.atguigu.gulimail.product.feign.WareFeignService;
 import com.atguigu.gulimail.product.service.*;
 import com.atguigu.gulimail.product.vo.*;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +30,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
+@Slf4j
 @Service("spuInfoService")
 public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> implements SpuInfoService {
 
@@ -53,6 +56,8 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
     CategoryService categoryService;
     @Autowired
     WareFeignService wareFeignService;
+    @Autowired
+    SearchFeignService searchFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -246,7 +251,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             collect = skuHasStockVos.getData().stream()
                     .collect(Collectors.toMap(e -> e.getSkuId(), ele -> ele.isHasStock()));
         } catch (Exception e) {
-            System.out.println(e);
+            log.error("{}",e);
         }
 
 
@@ -266,7 +271,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 esModel.setHasStock(finalCollect.get(esModel.getSkuId()));
             }
             //TODO 热度评分 默认0
-
+            esModel.setHotScore(0l);
 
             //TODO 查询品牌和分类的名字信息
             BrandEntity brandEntity = brandService.getBaseMapper().selectById(ele.getBrandId());
@@ -274,9 +279,14 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
             esModel.setBrandImg(brandEntity.getLogo());
             esModel.setCatalogName(categoryService.getBaseMapper().selectById(ele.getCatalogId()).getName());
             esModel.setAttrs(attrsList);
-
             return esModel;
         }).collect(Collectors.toList());
+
+        //最终把数据发给es保存
+        R r = searchFeignService.productStatuseUp(skuEsModelList);
+        if(r.getCode()==0){
+            baseMapper.updateSpuStatus(spuId, ProductConstant.SpuStatusEnum.UP.getCode());
+        }
     }
 
 

@@ -15,5 +15,5 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface WareSkuDao extends BaseMapper<WareSkuEntity> {
 
-    long getSkuStock(@Param("ele") Long ele);
+    Long getSkuStock(@Param("ele") Long ele);
 }

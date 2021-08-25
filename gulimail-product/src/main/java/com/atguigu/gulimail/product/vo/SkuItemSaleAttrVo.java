@@ -1,4 +1,4 @@
-package com.bigdata.gulimall.product.vo;
+package com.atguigu.gulimail.product.vo;
 
 import lombok.Data;
 import lombok.ToString;

@@ -135,7 +135,7 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
         AttrEntity attrEntity = new AttrEntity();
         BeanUtils.copyProperties(attr, attrEntity);
         this.updateById(attrEntity);
-        if (attr.getAttrType() == ProductConstant.AttrEnum.SALE.getCode()) {
+        if (attr.getAttrType() == ProductConstant.AttrEnum.BASE.getCode()) {
             AttrAttrgroupRelationEntity attrAttrgroupRelationEntity = new AttrAttrgroupRelationEntity();
             attrAttrgroupRelationEntity.setAttrGroupId(attr.getAttrGroupId());
             attrAttrgroupRelationEntity.setAttrId(attr.getAttrId());

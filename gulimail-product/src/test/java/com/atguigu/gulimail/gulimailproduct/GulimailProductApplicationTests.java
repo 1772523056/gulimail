@@ -5,6 +5,7 @@ import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import com.atguigu.gulimail.product.GulimailProductApplication;
 import com.atguigu.gulimail.product.entity.BrandEntity;
+import com.atguigu.gulimail.product.entity.SpuInfoEntity;
 import com.atguigu.gulimail.product.service.BrandService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.Test;
@@ -48,10 +49,11 @@ public class GulimailProductApplicationTests {
 
     @Test
     public void contextLoads() {
-        List<BrandEntity> list = brandService.list(new QueryWrapper<BrandEntity>().eq("brand_id", 1l));
-        list.stream().forEach(System.out::println);
-
+        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
+        spuInfoEntity.setId(1l);
+        System.out.println(spuInfoEntity.getId());
 
     }
+
 
 }

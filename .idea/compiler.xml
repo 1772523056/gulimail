@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Maven default annotation processors profile" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -9,40 +10,43 @@
         <module name="gulimail-member" />
         <module name="gulimail-common" />
         <module name="gulimail-product" />
+        <module name="gulimail-gateway" />
         <module name="gulimail-coupon" />
         <module name="renren-fast" />
         <module name="gulimail-ware" />
         <module name="gulimail-order" />
-        <module name="seaerch" />
+        <module name="gulimail-search" />
         <module name="gulimail-third-party" />
         <module name="renren-generator" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
-      <module name="gulimail" target="1.5" />
-      <module name="gulimail-common" target="8" />
+    <bytecodeTargetLevel target="8">
+      <module name="gulimail" target="1.8" />
+      <module name="gulimail-common" target="1.8" />
       <module name="gulimail-coupon" target="1.8" />
+      <module name="gulimail-gateway" target="1.8" />
       <module name="gulimail-member" target="1.8" />
       <module name="gulimail-order" target="1.8" />
       <module name="gulimail-product" target="1.8" />
+      <module name="gulimail-search" target="1.8" />
       <module name="gulimail-third-party" target="1.8" />
       <module name="gulimail-ware" target="1.8" />
       <module name="renren-fast" target="1.8" />
       <module name="renren-generator" target="1.8" />
-      <module name="seaerch" target="1.8" />
     </bytecodeTargetLevel>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="gulimail-coupon" options="-parameters" />
+      <module name="gulimail-gateway" options="-parameters" />
       <module name="gulimail-member" options="-parameters" />
       <module name="gulimail-order" options="-parameters" />
       <module name="gulimail-product" options="-parameters" />
+      <module name="gulimail-search" options="-parameters" />
       <module name="gulimail-third-party" options="-parameters" />
       <module name="gulimail-ware" options="-parameters" />
       <module name="renren-fast" options="-parameters" />
       <module name="renren-generator" options="-parameters" />
-      <module name="seaerch" options="-parameters" />
     </option>
   </component>
 </project>

@@ -1,0 +1,13 @@
+spring:
+  cloud:
+    alicloud:
+      access-key: LTAI5tHRqzmtR9nxvQQCw1x6
+      secret-key: YMLcIfcDuLNZn43LuGAbiTaSAXCrTh
+      oss:
+        endpoint: oss-cn-guangzhou.aliyuncs.com
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+server:
+  port: 30000
+  spring:
