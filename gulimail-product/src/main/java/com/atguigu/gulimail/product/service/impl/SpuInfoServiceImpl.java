@@ -1,5 +1,6 @@
 package com.atguigu.gulimail.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.atguigu.common.constant.ProductConstant;
 import com.atguigu.common.to.SkuReductionTo;
 import com.atguigu.common.to.SpuBoundTo;
@@ -221,6 +222,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         return new PageUtils(page);
     }
 
+    @Transactional
     @Override
     public void up(Long spuId) {
         List<SkuInfoEntity> skuInfoList = skuInfoService.list(new QueryWrapper<SkuInfoEntity>().eq("spu_id", spuId));
@@ -247,11 +249,13 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         //远程调用若有异常则继续
         Map<Long, Boolean> collect = null;
         try {
-            R<List<SkuHasStockVo>> skuHasStockVos = wareFeignService.hasStock(skuIds);
-            collect = skuHasStockVos.getData().stream()
+            R r = wareFeignService.hasStock(skuIds);
+            List<SkuHasStockVo> list1 = r.getData(new TypeReference<List<SkuHasStockVo>>() {
+            });
+            collect = list1.stream()
                     .collect(Collectors.toMap(e -> e.getSkuId(), ele -> ele.isHasStock()));
         } catch (Exception e) {
-            log.error("{}",e);
+            log.error("远程调用出错:{}", e);
         }
 
 
@@ -284,7 +288,7 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
 
         //最终把数据发给es保存
         R r = searchFeignService.productStatuseUp(skuEsModelList);
-        if(r.getCode()==0){
+        if (r.getCode() == 0) {
             baseMapper.updateSpuStatus(spuId, ProductConstant.SpuStatusEnum.UP.getCode());
         }
     }

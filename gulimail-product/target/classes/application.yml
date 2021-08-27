@@ -6,6 +6,8 @@ spring:
     password: xzb011026
     url: jdbc:mysql://localhost:3306/gulimall_pms
     driver-class-name: com.mysql.cj.jdbc.Driver
+  redis:
+    host: localhost
   cloud:
     nacos:
       discovery:
@@ -17,6 +19,8 @@ spring:
         endpoint: oss-cn-guangzhou.aliyuncs.com
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  thymeleaf:
+    cache: true
 mybatis-plus:
   global-config:
     db-config:
@@ -25,4 +29,4 @@ mybatis-plus:
       logic-not-delete-value: 0
 logging:
   level:
-    com.atguigu.gulimail: debug
+    com.atguigu.gulimail: error

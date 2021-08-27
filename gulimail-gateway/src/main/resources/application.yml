@@ -30,6 +30,10 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>/?.*), /$\{segment}
 
+        - id: gulimail_host
+          uri: lb://gulimail-product
+          predicates:
+            - Host=**.xzb.com
 
 
 

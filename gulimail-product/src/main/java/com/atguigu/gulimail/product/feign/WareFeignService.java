@@ -11,6 +11,6 @@ import java.util.List;
 @FeignClient("gulimail-ware")
 public interface WareFeignService {
     @PostMapping("ware/waresku/hasstock")
-     R<List<SkuHasStockVo>> hasStock(@RequestBody List<Long> skuIds);
+     R hasStock(@RequestBody List<Long> skuIds);
 
 }

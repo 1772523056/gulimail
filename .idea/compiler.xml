@@ -21,8 +21,8 @@
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="8">
-      <module name="gulimail" target="1.8" />
-      <module name="gulimail-common" target="1.8" />
+      <module name="gulimail" target="1.5" />
+      <module name="gulimail-common" target="8" />
       <module name="gulimail-coupon" target="1.8" />
       <module name="gulimail-gateway" target="1.8" />
       <module name="gulimail-member" target="1.8" />

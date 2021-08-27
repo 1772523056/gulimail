@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.FileInputStream;
@@ -26,6 +28,8 @@ public class GulimailProductApplicationTests {
     BrandService brandService;
     @Autowired
     OSSClient ossClient;
+    @Autowired
+    StringRedisTemplate stringRedisTemplate;
 
     @Test
     public void testFile() throws FileNotFoundException {
@@ -49,10 +53,9 @@ public class GulimailProductApplicationTests {
 
     @Test
     public void contextLoads() {
-        SpuInfoEntity spuInfoEntity = new SpuInfoEntity();
-        spuInfoEntity.setId(1l);
-        System.out.println(spuInfoEntity.getId());
-
+        ValueOperations<String, String> c = stringRedisTemplate.opsForValue();
+        c.set("hello","你好");
+        System.out.println(c.get("hello"));
     }
 
 
