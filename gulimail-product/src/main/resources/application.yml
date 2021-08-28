@@ -20,7 +20,14 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
-    cache: true
+    cache: false
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600000
+      key-prefix: CACHE_
+      use-key-prefix: false
+      cache-null-values: true
 mybatis-plus:
   global-config:
     db-config:

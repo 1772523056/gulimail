@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -62,6 +63,7 @@ public class CategoryController {
         return R.ok();
     }
     @RequestMapping("/update/sort")
+    @CacheEvict(value = "category",key = "'getLevelOne'")
     public R updateSort(@RequestBody CategoryEntity[] category) {
         categoryService.updateBatchById(Arrays.asList(category), category.length);
 

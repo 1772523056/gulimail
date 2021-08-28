@@ -3,7 +3,10 @@ package com.atguigu.gulimail.product.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.TypeReference;
 import com.atguigu.gulimail.product.vo.Catalog2Vo;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     StringRedisTemplate redis;
+    @Autowired
+    RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -75,12 +80,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     }
 
+    @Cacheable(value = {"category"},key = "#root.methodName")
     @Override
     public List<CategoryEntity> getLevelOne() {
-        long l = System.currentTimeMillis();
 
+        System.out.println("getLevelOne");
         List<CategoryEntity> cat_level = this.baseMapper.selectList(new QueryWrapper<CategoryEntity>().eq("cat_level", 1));
-//        System.out.println("消耗时间 :" + (System.currentTimeMillis() - l));
         return cat_level;
     }
 
@@ -89,15 +94,18 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     public Map<String, List<Catalog2Vo>> getCatalogJson() {
         String catalogJson = redis.opsForValue().get("catalogJson");
         if (StringUtils.isEmpty(catalogJson)) {
+            //todo 可能有很多线程同时进来查询
             System.out.println("开始查数据库-------");
-            Map<String, List<Catalog2Vo>> catalogJsonFromDb = getCatalogJsonFromDbWithRedisLock();
+            Map<String, List<Catalog2Vo>> catalogJsonFromDb = getCatalogJsonFromDbWithRedisLockV2();
             return catalogJsonFromDb;
         }
         return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catalog2Vo>>>() {
         });
     }
 
-    private Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLock() {
+    //todo 版本1:
+//todo 很多线程同时进来查询时,用分布式锁确保只有一个线程会访问数据库
+    private Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLockV1() {
 
         //todo 核心1:加锁和设置时间的结合,保证原子性,确保会正确过期
         String uuid = UUID.randomUUID().toString();
@@ -117,9 +125,22 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         } else {
             System.out.println("获取分布式锁失败");
-            return getCatalogJsonFromDbWithRedisLock();
+            return getCatalogJsonFromDbWithRedisLockV1();
         }
 
+    }
+
+    //todo V2 redisson
+    private Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLockV2() {
+        RLock catalog = redissonClient.getLock("catalog");
+        catalog.lock();
+        Map<String, List<Catalog2Vo>> dataFromDb;
+        try {
+            dataFromDb = getDataFromDb();
+        } finally {
+            catalog.unlock();
+        }
+        return dataFromDb;
     }
 
     public Map<String, List<Catalog2Vo>> getDataFromDb() {

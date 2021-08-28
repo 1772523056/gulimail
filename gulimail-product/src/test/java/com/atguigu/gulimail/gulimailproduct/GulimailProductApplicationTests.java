@@ -10,6 +10,7 @@ import com.atguigu.gulimail.product.service.BrandService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -30,6 +31,8 @@ public class GulimailProductApplicationTests {
     OSSClient ossClient;
     @Autowired
     StringRedisTemplate stringRedisTemplate;
+    @Autowired
+    RedissonClient redissonClient;
 
     @Test
     public void testFile() throws FileNotFoundException {
@@ -53,9 +56,7 @@ public class GulimailProductApplicationTests {
 
     @Test
     public void contextLoads() {
-        ValueOperations<String, String> c = stringRedisTemplate.opsForValue();
-        c.set("hello","你好");
-        System.out.println(c.get("hello"));
+        System.out.println(redissonClient);
     }
 
 
