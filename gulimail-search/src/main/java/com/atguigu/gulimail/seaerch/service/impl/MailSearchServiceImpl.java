@@ -1,6 +1,8 @@
 package com.atguigu.gulimail.seaerch.service.impl;
 
+import com.atguigu.common.utils.Query;
 import com.atguigu.gulimail.seaerch.config.ElasticSearchConfig;
+import com.atguigu.gulimail.seaerch.constant.EsConstant;
 import com.atguigu.gulimail.seaerch.service.MailSearchService;
 import com.atguigu.gulimail.seaerch.vo.SearchParam;
 import com.atguigu.gulimail.seaerch.vo.SearchResult;
@@ -12,7 +14,13 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilder;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -43,12 +51,14 @@ public class MailSearchServiceImpl implements MailSearchService {
     }
 
     private SearchRequest buidSeaerchRequest(SearchParam param) {
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
         BoolQueryBuilder query = QueryBuilders.boolQuery();
-        //must模糊匹配skuName
+        //todo 1. 查询 query
+        //todo 1.1 关键字模糊匹配 must
         if (!StringUtils.isEmpty(param.getKeyword())) {
             query.must(QueryBuilders.matchQuery("skuTitle", param.getKeyword()));
         }
+        //todo 1.2 根据选择过滤 filter
         //过滤三级分类id
         if (param.getCatalog3Id() != null) {
             query.filter(QueryBuilders.termQuery("catalogId", param.getCatalog3Id()));
@@ -74,11 +84,13 @@ public class MailSearchServiceImpl implements MailSearchService {
                     rangeQuery.gte(s[0]);
                 }
             }
+            query.filter(rangeQuery);
         }
+
         //根据属性查询
         if (!StringUtils.isEmpty(param.getAttrs())) {
-            BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
             for (String attr : param.getAttrs()) {
+                BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
                 String[] s = attr.split("_");
                 String attrId = s[0];
                 String[] attrValues = s[1].split(":");
@@ -88,14 +100,58 @@ public class MailSearchServiceImpl implements MailSearchService {
                 query.filter(QueryBuilders.nestedQuery("attrs", boolQueryBuilder, ScoreMode.None));
             }
         }
-        searchSourceBuilder.query(query);
+        //todo 2.排序 sort
+        //根据升序或降序排序
+        if (!StringUtils.isEmpty(param.getSort())) {
+            String[] s = param.getSort().split("_");
+            SortOrder order = s[1].equalsIgnoreCase("asc") ? SortOrder.ASC : SortOrder.DESC;
+            sourceBuilder.sort(s[0], order);
+        }
+
+        sourceBuilder.from((int) ((param.getPageNumber() - 1) * EsConstant.PRODUCT_PAGESIZE));
+        sourceBuilder.size(Math.toIntExact(EsConstant.PRODUCT_PAGESIZE));
+        //todo 3.高亮 highlight
+        //高亮
+        if (!StringUtils.isEmpty(param.getKeyword())) {
+            HighlightBuilder builder = new HighlightBuilder();
+            builder.field("skuTitle");
+            builder.preTags("<b style='color:red'>");
+            builder.postTags("</b>");
+            sourceBuilder.highlighter(builder);
+        }
 
 
-        SearchRequest searchRequest = new SearchRequest(new String[]{"product"}, searchSourceBuilder);
+        //todo 4.聚合 aggregations
+        //品牌聚合
+        TermsAggregationBuilder brandAgg = AggregationBuilders.terms("brand_agg");
+        brandAgg.field("brandId").size(10);
+        brandAgg.subAggregation(AggregationBuilders.terms("brand_name_agg").field("brandName").size(10));
+        brandAgg.subAggregation(AggregationBuilders.terms("brand_value_agg").field("brandValue").size(10));
+        sourceBuilder.aggregation(brandAgg);
+
+        //分类聚合
+        TermsAggregationBuilder catalogAgg = AggregationBuilders.terms("catalog_agg");
+        catalogAgg.field("catalogId").size(10);
+        catalogAgg.subAggregation(AggregationBuilders.terms("catalog_name_agg").field("catalogName").size(10));
+        sourceBuilder.aggregation(catalogAgg);
+
+        //属性聚合
+        NestedAggregationBuilder nestedAgg = AggregationBuilders.nested("attr_agg", "attrs");
+        TermsAggregationBuilder nestedAggregationBuilder = AggregationBuilders.terms("attr_id_agg").field("attrs.attrId").size(10);
+        nestedAggregationBuilder.subAggregation(AggregationBuilders.terms("attr_name_agg").field("attrs.attrName").size(10));
+        nestedAggregationBuilder.subAggregation(AggregationBuilders.terms("attr_value_agg").field("attrs.attrValue").size(10));
+        nestedAgg.subAggregation(nestedAggregationBuilder);
+        sourceBuilder.aggregation(nestedAgg);
+
+
+        sourceBuilder.query(query);
+        System.out.println(sourceBuilder.toString());
+        SearchRequest searchRequest = new SearchRequest(new String[]{"product"}, sourceBuilder);
         return searchRequest;
 
     }
 
     private SearchResult buildSearchResult() {
+        return null;
     }
 }

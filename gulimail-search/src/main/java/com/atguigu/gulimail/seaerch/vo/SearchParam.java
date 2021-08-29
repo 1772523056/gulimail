@@ -13,6 +13,6 @@ public class SearchParam {
     private String skuPrice; //价格区间
     private List<Long>  brandId; //品牌id
     private List<String> attrs;
-    private Integer pageNumber;
+    private Integer pageNumber=1;
 
 }
