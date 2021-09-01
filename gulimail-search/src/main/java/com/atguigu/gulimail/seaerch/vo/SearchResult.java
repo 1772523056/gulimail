@@ -2,6 +2,7 @@ package com.atguigu.gulimail.seaerch.vo;
 
 import com.atguigu.common.to.es.SkuEsModel;
 import lombok.Data;
+
 import java.util.List;
 
 @Data
@@ -14,6 +15,15 @@ public class SearchResult {
     List<BrandVo> brands;
     List<AttrVo> attrs;
     List<CatalogVo> catalogs;
+    List<NavVo> navs;
+    List<Integer> pageNavs;
+
+    @Data
+    public static class NavVo {
+        String navName;
+        String naveValue;
+        String link;
+    }
 
     @Data
     public static class BrandVo {
@@ -31,7 +41,7 @@ public class SearchResult {
 
     @Data
     public static class CatalogVo {
-        List catalogId;
+        Long catalogId;
         String catalogName;
     }
 }

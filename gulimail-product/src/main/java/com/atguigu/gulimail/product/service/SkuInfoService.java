@@ -1,5 +1,6 @@
 package com.atguigu.gulimail.product.service;
 
+import com.atguigu.gulimail.product.vo.SkuItemVo;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.atguigu.common.utils.PageUtils;
 import com.atguigu.gulimail.product.entity.SkuInfoEntity;
@@ -20,5 +21,7 @@ public interface SkuInfoService extends IService<SkuInfoEntity> {
     void saveSkuInfo(SkuInfoEntity skuInfoEntity);
 
     PageUtils queryPageByCondition(Map<String, Object> params);
+
+    SkuItemVo item(Long skuId);
 }
 

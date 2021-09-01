@@ -14,7 +14,7 @@ spring:
             max-pool-prepared-statement-per-connection-size: 20
             time-between-eviction-runs-millis: 60000
             min-evictable-idle-time-millis: 300000
-            #Oracle需要打开注释
+            #Oracle�?要打�?注释
             #validation-query: SELECT 1 FROM DUAL
             test-while-idle: true
             test-on-borrow: false
@@ -34,7 +34,7 @@ spring:
                         multi-statement-allow: true
 
 
-##多数据源的配置
+##多数据源的配�?
 #dynamic:
 #  datasource:
 #    slave1:

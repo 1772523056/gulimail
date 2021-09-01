@@ -3,6 +3,7 @@ package com.atguigu.gulimail.product.app;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.atguigu.gulimail.product.entity.AttrEntity;
 import com.atguigu.gulimail.product.vo.AttrResVo;
 import com.atguigu.gulimail.product.vo.AttrVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +51,8 @@ public class AttrController {
 
         return R.ok().put("attr", attrResVo);
     }
+
+
 
     /**
      * 保存

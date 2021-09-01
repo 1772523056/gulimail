@@ -33,7 +33,7 @@ spring:
         - id: gulimail_host
           uri: lb://gulimail-product
           predicates:
-            - Host=xzb.com
+            - Host=xzb.com,item.xzb.com
 
         - id: gulimail_search
           uri: lb://gulimail-search

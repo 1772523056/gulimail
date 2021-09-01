@@ -9,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 @EnableFeignClients(basePackages = "com.atguigu.gulimail.product.feign")
 @EnableCaching
 @EnableDiscoveryClient
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.atguigu.gulimail.product")
 public class GulimailProductApplication {
 
     public static void main(String[] args) {

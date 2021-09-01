@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="Encoding">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true">
     <file url="file://$PROJECT_DIR$/gulimail-coupon/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gulimail-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gulimail-member/src/main/java" charset="UTF-8" />
@@ -11,6 +11,10 @@
     <file url="file://$PROJECT_DIR$/gulimail-third-party/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/gulimail-ware/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/renren-fast/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/renren-fast/src/main/resources/application-dev.yml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/renren-fast/src/main/resources/application-prod.yml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/renren-fast/src/main/resources/application-test.yml" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/renren-fast/src/main/resources/application.yml" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/renren-generator/src/main/java" charset="UTF-8" />
   </component>
 </project>
