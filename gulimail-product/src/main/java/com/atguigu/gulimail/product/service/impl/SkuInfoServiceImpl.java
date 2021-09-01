@@ -7,6 +7,7 @@ import com.atguigu.gulimail.product.service.AttrGroupService;
 import com.atguigu.gulimail.product.service.SkuImagesService;
 import com.atguigu.gulimail.product.service.SpuInfoDescService;
 import com.atguigu.gulimail.product.vo.SkuItemVo;
+import com.atguigu.gulimail.product.vo.SpuItemAttrGroupVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -103,6 +104,7 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         SkuItemVo skuItemVo = new SkuItemVo();
         //skuinfo
         SkuInfoEntity skuInfoEntity = this.baseMapper.selectById(skuId);
+        Long catalogId = skuInfoEntity.getCatalogId();
         skuItemVo.setInfo(skuInfoEntity);
 
         //skuimag
@@ -120,7 +122,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
 
         //spu的规格参数信息
-
+        List<SpuItemAttrGroupVo> list = attrGroupService.getSpuItemAttrGroupVoWithAttrsBySpuId(spuId, catalogId);
+        return skuItemVo;
     }
 
 

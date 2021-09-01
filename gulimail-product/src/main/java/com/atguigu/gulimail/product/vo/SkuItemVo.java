@@ -1,6 +1,5 @@
 package com.atguigu.gulimail.product.vo;
 
-
 import com.atguigu.gulimail.product.entity.SkuImagesEntity;
 import com.atguigu.gulimail.product.entity.SkuInfoEntity;
 import com.atguigu.gulimail.product.entity.SpuInfoDescEntity;
@@ -30,24 +29,5 @@ public class SkuItemVo {
     //5. 获取SPU的规格参数信息
     List<SpuItemAttrGroupVo> groupAttrs;
 
-    //销售属性
-    @Data
-    public static class SkuItemSaleAttrVo {
-        private Long attrId;
-        private String attrName;
-        private String attrValue;
-    }
-    //基本属性
-    @Data
-    public static class SpuItemAttrGroupVo {
-        private String groupName;
-        private List<SpuBaseAttrVo> attrs;
-    }
-    //基本属性里的规格参数
-    @Data
-    public static class SpuBaseAttrVo {
-        private String attrName;
-        private String attrValue;
-    }
 
 }

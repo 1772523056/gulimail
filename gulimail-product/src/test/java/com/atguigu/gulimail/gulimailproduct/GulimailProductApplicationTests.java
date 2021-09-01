@@ -4,9 +4,12 @@ import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import com.atguigu.gulimail.product.GulimailProductApplication;
+import com.atguigu.gulimail.product.dao.AttrGroupDao;
 import com.atguigu.gulimail.product.entity.BrandEntity;
 import com.atguigu.gulimail.product.entity.SpuInfoEntity;
 import com.atguigu.gulimail.product.service.BrandService;
+import com.atguigu.gulimail.product.vo.SkuItemVo;
+import com.atguigu.gulimail.product.vo.SpuItemAttrGroupVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,6 +36,8 @@ public class GulimailProductApplicationTests {
     StringRedisTemplate stringRedisTemplate;
     @Autowired
     RedissonClient redissonClient;
+    @Autowired
+    AttrGroupDao attrGroupDaol;
 
     @Test
     public void testFile() throws FileNotFoundException {
@@ -56,7 +61,8 @@ public class GulimailProductApplicationTests {
 
     @Test
     public void contextLoads() {
-        System.out.println(redissonClient);
+        List<SpuItemAttrGroupVo> spuItemAttrGroupVoWithAttrsBySpuId = attrGroupDaol.getSpuItemAttrGroupVoWithAttrsBySpuId(47l, 225l);
+        System.out.println(spuItemAttrGroupVoWithAttrsBySpuId);
     }
 
 

@@ -5,6 +5,8 @@ import com.atguigu.gulimail.product.dao.AttrDao;
 import com.atguigu.gulimail.product.entity.AttrAttrgroupRelationEntity;
 import com.atguigu.gulimail.product.entity.AttrEntity;
 import com.atguigu.gulimail.product.vo.AttrGroupWithAttrVo;
+import com.atguigu.gulimail.product.vo.SkuItemVo;
+import com.atguigu.gulimail.product.vo.SpuItemAttrGroupVo;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,6 +89,11 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         return list.toArray(new AttrGroupWithAttrVo[0]);
 
 
+    }
+
+    @Override
+    public List<SpuItemAttrGroupVo> getSpuItemAttrGroupVoWithAttrsBySpuId(Long spuId, Long catalogId) {
+        return this.baseMapper.getSpuItemAttrGroupVoWithAttrsBySpuId(spuId,catalogId);
     }
 
 }
