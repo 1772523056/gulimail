@@ -1,0 +1,27 @@
+{
+  "groups": [
+    {
+      "name": "gulimail.thread",
+      "type": "com.atguigu.gulimail.product.config.ThreadPoolConfigProperties",
+      "sourceType": "com.atguigu.gulimail.product.config.ThreadPoolConfigProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "gulimail.thread.core-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.atguigu.gulimail.product.config.ThreadPoolConfigProperties"
+    },
+    {
+      "name": "gulimail.thread.keep-alive-time",
+      "type": "java.lang.Integer",
+      "sourceType": "com.atguigu.gulimail.product.config.ThreadPoolConfigProperties"
+    },
+    {
+      "name": "gulimail.thread.max-size",
+      "type": "java.lang.Integer",
+      "sourceType": "com.atguigu.gulimail.product.config.ThreadPoolConfigProperties"
+    }
+  ],
+  "hints": []
+}

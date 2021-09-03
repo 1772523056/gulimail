@@ -6,6 +6,7 @@ import com.atguigu.gulimail.product.entity.SpuInfoDescEntity;
 import com.atguigu.gulimail.product.service.AttrGroupService;
 import com.atguigu.gulimail.product.service.SkuImagesService;
 import com.atguigu.gulimail.product.service.SpuInfoDescService;
+import com.atguigu.gulimail.product.vo.SkuItemSaleAttrVo;
 import com.atguigu.gulimail.product.vo.SkuItemVo;
 import com.atguigu.gulimail.product.vo.SpuItemAttrGroupVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,9 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -34,6 +38,10 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     SpuInfoDescService spuInfoDescService;
     @Autowired
     AttrGroupService attrGroupService;
+    @Autowired
+    SkuInfoService skuInfoService;
+    @Autowired
+    ThreadPoolExecutor executor;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -91,7 +99,6 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             }
         }
 
-
         IPage<SkuInfoEntity> page = this.page(
                 new Query<SkuInfoEntity>().getPage(params), queryWrapper
         );
@@ -103,27 +110,43 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     public SkuItemVo item(Long skuId) {
         SkuItemVo skuItemVo = new SkuItemVo();
         //skuinfo
-        SkuInfoEntity skuInfoEntity = this.baseMapper.selectById(skuId);
-        Long catalogId = skuInfoEntity.getCatalogId();
-        skuItemVo.setInfo(skuInfoEntity);
+        CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {
+            SkuInfoEntity skuInfoEntity = this.baseMapper.selectById(skuId);
+            skuItemVo.setInfo(skuInfoEntity);
+            return skuInfoEntity;
+        }, executor);
+        //spu的介绍
+        CompletableFuture<Void> voidCompletableFuture = infoFuture.thenAcceptAsync((res) -> {
+            SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getBaseMapper().selectById(res.getSpuId());
+            skuItemVo.setDesp(spuInfoDescEntity);
+        }, executor);
+        //获取销售属性组合
+        CompletableFuture<Void> voidCompletableFuture1 = infoFuture.thenAcceptAsync((res) -> {
+            Long spuId = res.getSpuId();
+            List<SkuItemSaleAttrVo> list = this.baseMapper.selectSkuAttrsBySpuId(spuId);
+            skuItemVo.setSaleAttr(list);
+        }, executor);
+        //spu的规格参数信息
+        CompletableFuture<Void> voidCompletableFuture2 = infoFuture.thenAcceptAsync((res) -> {
+            List<SpuItemAttrGroupVo> list1 = attrGroupService.getSpuItemAttrGroupVoWithAttrsBySpuId(res.getSpuId(), res.getCatalogId());
+            skuItemVo.setGroupAttrs(list1);
+        });
 
         //skuimag
-        List<SkuImagesEntity> skuImagesEntityList = skuImagesService.getBaseMapper().selectList(
-                new QueryWrapper<SkuImagesEntity>().eq("skuId", skuId));
-        skuItemVo.setImages(skuImagesEntityList);
+        CompletableFuture<Void> sku_id = CompletableFuture.runAsync(() -> {
+            List<SkuImagesEntity> skuImagesEntityList = skuImagesService.getBaseMapper().selectList(
+                    new QueryWrapper<SkuImagesEntity>().eq("sku_id", skuId));
+            skuItemVo.setImages(skuImagesEntityList);
+        });
 
-        //spuinfo
-        Long spuId = skuInfoEntity.getSpuId();
+        try {
+            CompletableFuture.allOf(voidCompletableFuture,voidCompletableFuture1,voidCompletableFuture2,sku_id).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
 
-
-        //spu的介绍
-        SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getBaseMapper().selectById(spuId);
-        skuItemVo.setDesp(spuInfoDescEntity);
-
-
-        //spu的规格参数信息
-        List<SpuItemAttrGroupVo> list = attrGroupService.getSpuItemAttrGroupVoWithAttrsBySpuId(spuId, catalogId);
-        skuItemVo.setGroupAttrs(list);
 
         return skuItemVo;
     }

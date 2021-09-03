@@ -3,7 +3,7 @@
 
 <mapper namespace="com.atguigu.gulimail.product.dao.SkuInfoDao">
 
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="com.atguigu.gulimail.product.entity.SkuInfoEntity" id="skuInfoMap">
         <result property="skuId" column="sku_id"/>
         <result property="spuId" column="spu_id"/>
@@ -17,6 +17,27 @@
         <result property="price" column="price"/>
         <result property="saleCount" column="sale_count"/>
     </resultMap>
+    <resultMap id="a" type="com.atguigu.gulimail.product.vo.SkuItemSaleAttrVo">
+        <result column="attr_id" property="attrId"></result>
+        <result column="attr_name" property="attrName"></result>
+        <collection property="attrValues" ofType="com.atguigu.gulimail.product.vo.AttrValueWithSkuIdVo">
+            <result column="attr_value" property="attrValue"></result>
+            <result column="sku_ids" property="skuIds"></result>
+        </collection>
+<!--        <result column="attr_value" property="attrValue"></result>-->
+<!--        <result column="sku_ids" property="skuIds"></result>-->
+    </resultMap>
+    <select id="selectSkuAttrsBySpuId" resultMap="a">
+        select b.attr_id,
+               b.attr_name,
+               b.attr_value ,
+               group_concat(a.sku_id) sku_ids
+        from gulimall_pms.pms_sku_info a
+                 left join gulimall_pms.pms_sku_sale_attr_value b
+                           on a.sku_id = b.sku_id
+        where a.spu_id = #{spuId}
+        group by b.attr_id, b.attr_name, b.attr_value;
+    </select>
 
 
 </mapper>

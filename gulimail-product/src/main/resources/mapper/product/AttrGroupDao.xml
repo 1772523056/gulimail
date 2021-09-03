@@ -14,7 +14,7 @@
     </resultMap>
     <resultMap id="spuItemAttrGroupVo" type="com.atguigu.gulimail.product.vo.SpuItemAttrGroupVo">
         <result property="groupName" column="attr_group_name"></result>
-        <collection property="attrs" ofType="com.atguigu.gulimail.product.vo.SkuItemVo.SpuBaseAttrVo">
+        <collection property="attrs" ofType="com.atguigu.gulimail.product.vo.Attr">
             <result column="attr_name" property="attrName"></result>
             <result column="attr_value" property="attrValue"></result>
         </collection>

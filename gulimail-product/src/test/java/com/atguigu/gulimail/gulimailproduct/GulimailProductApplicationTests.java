@@ -5,9 +5,11 @@ import com.aliyun.oss.OSSClient;
 import com.aliyun.oss.OSSClientBuilder;
 import com.atguigu.gulimail.product.GulimailProductApplication;
 import com.atguigu.gulimail.product.dao.AttrGroupDao;
+import com.atguigu.gulimail.product.dao.SkuInfoDao;
 import com.atguigu.gulimail.product.entity.BrandEntity;
 import com.atguigu.gulimail.product.entity.SpuInfoEntity;
 import com.atguigu.gulimail.product.service.BrandService;
+import com.atguigu.gulimail.product.vo.SkuItemSaleAttrVo;
 import com.atguigu.gulimail.product.vo.SkuItemVo;
 import com.atguigu.gulimail.product.vo.SpuItemAttrGroupVo;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -38,6 +40,8 @@ public class GulimailProductApplicationTests {
     RedissonClient redissonClient;
     @Autowired
     AttrGroupDao attrGroupDaol;
+    @Autowired
+    SkuInfoDao skuInfoDao;
 
     @Test
     public void testFile() throws FileNotFoundException {
@@ -61,8 +65,13 @@ public class GulimailProductApplicationTests {
 
     @Test
     public void contextLoads() {
-        List<SpuItemAttrGroupVo> spuItemAttrGroupVoWithAttrsBySpuId = attrGroupDaol.getSpuItemAttrGroupVoWithAttrsBySpuId(47l, 225l);
+        List<SpuItemAttrGroupVo> spuItemAttrGroupVoWithAttrsBySpuId = attrGroupDaol.getSpuItemAttrGroupVoWithAttrsBySpuId(100l, 225l);
         System.out.println(spuItemAttrGroupVoWithAttrsBySpuId);
+    }
+    @Test
+    public void test3(){
+        List<SkuItemSaleAttrVo> list = skuInfoDao.selectSkuAttrsBySpuId(49l);
+        System.out.println(list);
     }
 
 

@@ -61,6 +61,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     }
 
+    private List<CategoryEntity> getChildrens(CategoryEntity root, List<CategoryEntity> all) {
+        return all.stream().filter(ele -> ele.getParentCid() == root.getCatId())
+                .map(ele -> {
+                    ele.setChildren(getChildrens(ele, all));
+                    return ele;
+                })
+                .sorted(Comparator.comparingInt(num -> (num.getSort() == null ? 0 : num.getSort())))
+                .collect(Collectors.toList());
+    }
+
     @Override
     public void removeMenuByIds(List<Long> asList) {
         //TODO 判断是否被引用
@@ -89,8 +99,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return cat_level;
     }
 
-
     //TODO 加入redis缓存
+
     public Map<String, List<Catalog2Vo>> getCatalogJson() {
         String catalogJson = redis.opsForValue().get("catalogJson");
         if (StringUtils.isEmpty(catalogJson)) {
@@ -102,9 +112,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catalog2Vo>>>() {
         });
     }
-
     //todo 版本1:
 //todo 很多线程同时进来查询时,用分布式锁确保只有一个线程会访问数据库
+
     private Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLockV1() {
 
         //todo 核心1:加锁和设置时间的结合,保证原子性,确保会正确过期
@@ -129,8 +139,8 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         }
 
     }
-
     //todo V2 redisson
+
     private Map<String, List<Catalog2Vo>> getCatalogJsonFromDbWithRedisLockV2() {
         RLock catalog = redissonClient.getLock("catalog");
         catalog.lock();
@@ -195,15 +205,5 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
             getPath(categoryEntity.getParentCid(), list);
         }
         list.add(id);
-    }
-
-    private List<CategoryEntity> getChildrens(CategoryEntity root, List<CategoryEntity> all) {
-        return all.stream().filter(ele -> ele.getParentCid() == root.getCatId())
-                .map(ele -> {
-                    ele.setChildren(getChildrens(ele, all));
-                    return ele;
-                })
-                .sorted(Comparator.comparingInt(num -> (num.getSort() == null ? 0 : num.getSort())))
-                .collect(Collectors.toList());
     }
 }
